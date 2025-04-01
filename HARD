@@ -1,0 +1,46 @@
+class Student {
+int studentID;
+String name;
+String department;
+double marks;
+public Student(int studentID, String name, String department, double marks) {
+this.studentID = studentID;
+this.name = name;
+this.department = department;
+this.marks = marks;
+}
+}
+class StudentController {
+Connection con;
+public StudentController() throws SQLException {
+con = DriverManager.getConnection("jdbc:mysql://localhost:3306/university","root", "password")
+}
+public void addStudent(Student student) throws SQLException {
+String query = "INSERT INTO Student (StudentID, Name, Department, Marks) VALUES (?, ?, ?, ?)";
+try (PreparedStatement ps = con.prepareStatement(query)) {
+ps.setInt(1, student.studentID);
+ps.setString(2, student.name);
+ps.setString(3, student.department);
+ps.setDouble(4, student.marks);
+ps.executeUpdate();
+System.out.println("Student Added!");
+}
+}
+public void viewStudents() throws SQLException {
+String query = "SELECT * FROM Student";
+try (Statement stmt = con.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
+System.out.println("ID | Name | Department | Marks");
+System.out.println("--------------------------------");
+while (rs.next()) {
+System.out.printf("%d | %s | %s | %.2f\n", rs.getInt("StudentID"), rs.getString("Name"), rs.getString("Department"), rs.getDouble("Marks"));
+}
+}
+}
+}
+class StudentManagement {
+public static void main(String[] args) throws SQLException {
+StudentController controller = new StudentController();
+controller.addStudent(new Student(1, "Alice", "CS", 85));
+controller.viewStudents();
+}
+}
